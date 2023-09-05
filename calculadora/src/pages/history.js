@@ -1,20 +1,21 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import History from '../components/History';
+import { getHistory } from '../history';
+
+import Link from 'next/link';
 
 const HistoryPage = ( ) => {
-    const router = useRouter();
-    const { query } = router.query;
+    const history = getHistory();
     
-    const history = query ? query.split(',') : [];
-    
+    const handleHistoryClick = (index) =>{
+
+    }
     return (
         <div>
-            <h2>Historial de Calculos</h2>
-            <ul>
-                {history.map((item, index) => (
-                    <li key={index}>{item}</li>
-                ))}
-            </ul>
+            <Link href="/" legacyBehavior>
+                <a>Calculadora</a>
+            </Link>
+            <History history={history} onClick={handleHistoryClick}/>
         </div>
     )
 }

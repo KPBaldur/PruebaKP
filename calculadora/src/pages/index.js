@@ -1,14 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CalculatorInput from '../components/CalculatorInput';
 import CalculatorButtons from '../components/CalculatorButtons';
 import History from '../components/History';
+import { getHistory, updateHistory } from '../history';
 
 import Link from 'next/link';
+
 
 const Calculator = () => {
     const [input, setInput] = useState('');
     const [history, setHistory] = useState([]);
-    const [currentOperation, setCurrentOperation] = useState(''); // Agrega el estado para la operación actual
+    const [currentOperation, setCurrentOperation] = useState('');
+  
+    useEffect(() => {
+      // Cargar el historial desde localStorage cuando se monta la página
+      const storedHistory = getHistory();
+      setHistory(storedHistory);
+    }, []);
   
     const handleInputChange = (value) => {
       setInput(value);
@@ -19,38 +27,62 @@ const Calculator = () => {
         try {
           const result = eval(input);
           const operation = `${input} = ${result}`;
-          setHistory([...history, operation]);
-          setCurrentOperation(operation); // Actualiza la operación actual
+          const newHistory = [...history, operation];
+          setHistory(newHistory);
+          setCurrentOperation(operation);
           setInput(result.toString());
+  
+          // Actualizar el historial en localStorage
+          updateHistory(newHistory);
         } catch (error) {
           setInput('Error');
         }
       } else if (button === 'C') {
         setInput('');
-        setCurrentOperation(''); // Borra la operación actual al borrar el input
+        setCurrentOperation('');
       } else {
         setInput(input + button);
-        setCurrentOperation(currentOperation + button); // Actualiza la operación actual al ingresar dígitos
+        setCurrentOperation(currentOperation + button);
       }
     };
   
     const handleHistoryClick = (index) => {
       setInput(history[index].split('=')[0]);
-      setCurrentOperation(history[index]); // Actualiza la operación actual al hacer clic en el historial
+      setCurrentOperation(history[index]);
     };
+
+    const handleClearAll = () => {
+    // Borrar todos los registros del historial
+    setHistory([]);
+    setCurrentOperation('');
+
+    // Actualizar el historial en localStorage
+    updateHistory([]);
+  };
+
+  const handleDelete = (index) => {
+    // Borrar un registro específico del historial
+    const newHistory = [...history];
+    newHistory.splice(index, 1);
+    setHistory(newHistory);
+
+    // Actualizar el historial en localStorage
+    updateHistory(newHistory);
+  };
   
     return (
       <div className="calculator">
-        <p>{currentOperation}</p> {/* Muestra la operación actual */}
+        <p>{currentOperation}</p>
         <CalculatorInput value={input} onChange={handleInputChange} />
         <CalculatorButtons onClick={handleButtonClick} />
-        <History history={history} onClick={handleHistoryClick} />
-
-        <Link href={`/history?${history.join(',')}`} legacyBehavior>
-            <a>Ver Historial</a>
-        </Link>
+        <History 
+            history={history} 
+            onClick={handleHistoryClick} 
+            onClearAll={handleClearAll} 
+            onDelete={handleDelete}
+        />
       </div>
     );
   };
-
-export default Calculator;
+  
+  export default Calculator;
