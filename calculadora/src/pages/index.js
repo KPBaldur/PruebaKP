@@ -3,6 +3,8 @@ import CalculatorInput from '../components/CalculatorInput';
 import CalculatorButtons from '../components/CalculatorButtons';
 import History from '../components/History';
 
+import Link from 'next/link';
+
 const Calculator = () => {
     const [input, setInput] = useState('');
     const [history, setHistory] = useState([]);
@@ -43,6 +45,10 @@ const Calculator = () => {
         <CalculatorInput value={input} onChange={handleInputChange} />
         <CalculatorButtons onClick={handleButtonClick} />
         <History history={history} onClick={handleHistoryClick} />
+
+        <Link href={`/history?${history.join(',')}`} legacyBehavior>
+            <a>Ver Historial</a>
+        </Link>
       </div>
     );
   };
